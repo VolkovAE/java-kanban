@@ -7,8 +7,4 @@ public class ID {
     public static int createId() {
         return ++numberOfTasks;
     }
-
-    public static void reset() {
-        numberOfTasks = 0;
-    }
 }

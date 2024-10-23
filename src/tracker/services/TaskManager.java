@@ -10,9 +10,9 @@ import java.util.HashMap;
 
 public class TaskManager {
 
-    private static HashMap<Integer, Task> tableTasks = new HashMap<>();
-    private static HashMap<Integer, Subtask> tableSubtasks = new HashMap<>();
-    private static HashMap<Integer, Epic> tableEpics = new HashMap<>();
+    private static final HashMap<Integer, Task> tableTasks = new HashMap<>();
+    private static final HashMap<Integer, Subtask> tableSubtasks = new HashMap<>();
+    private static final HashMap<Integer, Epic> tableEpics = new HashMap<>();
 
     /* Методы для каждого из типа задач(Задача/Эпик/Подзадача): */
 
