@@ -55,7 +55,16 @@ public class Task {
         return status;
     }
 
-    public void setStatus(STATUS status) {
+    protected void setStatus(STATUS status) {
         this.status = status;
+    }
+
+    /// Начальное состояние определяется в конструкторах.
+    /// Маршрут: STATUS.NEW -> STATUS.IN_PROGRESS -> STATUS.DONE
+    public void runStateMachine() {
+        switch (status) {
+            case NEW -> setStatus(STATUS.IN_PROGRESS);
+            case IN_PROGRESS -> setStatus(STATUS.DONE);
+        }
     }
 }

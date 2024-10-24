@@ -1,6 +1,5 @@
 package tracker.services;
 
-import tracker.model.enums.STATUS;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
@@ -103,12 +102,7 @@ public class TaskManager {
         //a. Менеджер сам не выбирает статус для задачи. Информация о нём приходит
         // менеджеру вместе с информацией о самой задаче. По этим данным в одних случаях
         // он будет сохранять статус, в других будет рассчитывать.
-        STATUS curStatusTask = task.getStatus();
-        if (curStatusTask == STATUS.NEW) {
-            task.setStatus(STATUS.IN_PROGRESS);
-        } else if (curStatusTask == STATUS.IN_PROGRESS) {
-            task.setStatus(STATUS.DONE);
-        }
+        task.runStateMachine();
 
         tableTasks.put(task.getId(), task);
     }
@@ -118,20 +112,21 @@ public class TaskManager {
 
         //Для эпиков:
         //если у эпика нет подзадач или все они имеют статус NEW, то статус должен быть NEW.
-        //  Ситуации:
+        //  Ситуации (метод addSubtask):
         //      - создаю новый эпик, подзадач нет, статус NEW.
-        //      - todo: добавляю новую задачу в эпик, статус у нее NEW. Смена статусов эпика:
+        //      - добавляю новую задачу в эпик, статус у нее NEW. Смена статусов эпика:
         //          - NEW -> NEW (не меняем)
         //          - IN_PROGRESS -> IN_PROGRESS (не меняем)
         //          - DONE -> NEW (заново открываем эпик)
         //если все подзадачи имеют статус DONE, то и эпик считается завершённым — со статусом DONE.
         //  Ситуации:
-        //      - todo: обновляю подзадачу, происходит смена статусов ее и эпика:
+        //      - обновляю подзадачу, происходит смена статусов ее и эпика:
         //          - подзадачи NEW -> IN_PROGRESS, эпику устанавливаем IN_PROGRESS
         //          - подзадачи IN_PROGRESS -> DONE, эпику устанавливаем:
         //              - DONE - если все подзадачи закрыты
         //              - IN_PROGRESS - во всех остальных случаях
         //        во всех остальных случаях статус должен быть IN_PROGRESS.
+        subtask.runStateMachine();
 
         tableSubtasks.put(subtask.getId(), subtask);
     }
