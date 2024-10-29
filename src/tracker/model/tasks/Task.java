@@ -17,7 +17,7 @@ public class Task {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
@@ -25,7 +25,7 @@ public class Task {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return id;
     }
 
