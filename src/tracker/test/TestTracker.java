@@ -5,14 +5,13 @@ import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 import tracker.services.TaskManager;
 
-import java.io.IOException;
 import java.util.Scanner;
 
 public class TestTracker {
 
-    private TaskManager taskManager = new TaskManager();
+    private final TaskManager taskManager = new TaskManager();
 
-    private Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
 
     public void execTest() {
 
