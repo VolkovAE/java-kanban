@@ -12,7 +12,16 @@ public class Epic extends Task {
     }
 
     public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
+        return new ArrayList<>(subtasks);   //subtasks;
+    }
+
+    //public void setSubtasks(ArrayList<Subtask> subtasks) {
+    public void setSubtasks() {
+        subtasks = new ArrayList<>();  //в сеттере будем сбрасывать список подзадач
+    }
+
+    public void setSubtasks(Subtask subtask) {
+        subtasks.add(subtask);
     }
 
     public void setSubtasks(ArrayList<Subtask> subtasks) {
@@ -31,5 +40,28 @@ public class Epic extends Task {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), subtasks);
+    }
+
+    @Override
+    public String toString() {
+
+        String info = "Epic{" +
+                "name='" + name + '\'' +
+                ", descr='" + descr + '\'' +
+                ", id=" + getId() +
+                ", status=" + getStatus() +
+                '}';
+
+        String infoSubtask = "";
+        for (Subtask subtask : subtasks) {
+            infoSubtask += "                " + subtask + "\n";
+        }
+
+        if (infoSubtask.isEmpty()) infoSubtask = "          Подзадач нет.";
+        else infoSubtask = "            Подзадачи:\n" + infoSubtask;
+
+        info += "\n" + infoSubtask;
+
+        return info;
     }
 }

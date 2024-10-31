@@ -1,19 +1,42 @@
 package tracker.model.tasks;
 
 import tracker.model.enums.STATUS;
-import tracker.services.ID;
 
 public class Task {
+
+    private STATUS status = STATUS.NEW;
+    private int id;
+
     protected String name;
     protected String descr;
-    protected int id;
-    protected STATUS status;
 
     public Task(String name, String descr) {
         this.name = name;
         this.descr = descr;
-        this.id = ID.createId();
-        this.status = STATUS.NEW;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescr() {
+        return descr;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public STATUS getStatus() {
+        return status;
+    }
+
+    public void setStatus(STATUS status) {
+        this.status = status;
     }
 
     @Override
@@ -37,34 +60,5 @@ public class Task {
                 ", id=" + id +
                 ", status=" + status +
                 '}';
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescr() {
-        return descr;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public STATUS getStatus() {
-        return status;
-    }
-
-    protected void setStatus(STATUS status) {
-        this.status = status;
-    }
-
-    /// Начальное состояние определяется в конструкторах.
-    /// Маршрут: STATUS.NEW -> STATUS.IN_PROGRESS -> STATUS.DONE
-    public void runStateMachine() {
-        switch (status) {
-            case NEW -> setStatus(STATUS.IN_PROGRESS);
-            case IN_PROGRESS -> setStatus(STATUS.DONE);
-        }
     }
 }
