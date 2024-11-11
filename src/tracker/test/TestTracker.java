@@ -3,13 +3,14 @@ package tracker.test;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
+import tracker.services.InMemoryTaskManager;
 import tracker.services.TaskManager;
 
 import java.util.Scanner;
 
 public class TestTracker {
 
-    private final TaskManager taskManager = new TaskManager();
+    private final TaskManager taskManager = new InMemoryTaskManager();
 
     private final Scanner scanner = new Scanner(System.in);
 
