@@ -3,14 +3,15 @@ package tracker.test;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
-import tracker.services.InMemoryTaskManager;
+import tracker.services.HistoryManager;
+import tracker.services.Managers;
 import tracker.services.TaskManager;
 
 import java.util.Scanner;
 
 public class TestTracker {
-
-    private final TaskManager taskManager = new InMemoryTaskManager();
+    private final TaskManager taskManager = Managers.getDefault();  //получаем объект одного из менеджеров
+    private final HistoryManager historyManager = Managers.getDefaultHistory(); //получаем объект одного из менеджеров
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -18,6 +19,8 @@ public class TestTracker {
 
         //Распечатайте списки эпиков, задач и подзадач через System.out.println(..).
         execTest001();  //создаем задачи для выполнения тестов
+
+        printAllTasks();    //добавил функцию печати из ТЗ для отладки
 
         //Измените статусы созданных объектов, распечатайте их.
         // Проверьте, что статус задачи и подзадачи сохранился, а статус эпика рассчитался по статусам подзадач.
@@ -27,6 +30,8 @@ public class TestTracker {
 
         //И, наконец, попробуйте удалить одну из задач и один из эпиков.
         execTest004();
+
+        printAllTasks();
     }
 
     private void execTest001() {
@@ -117,6 +122,34 @@ public class TestTracker {
         }
         System.out.println('\n');
         System.out.println("=".repeat(15));
+
+        System.out.print("Next...");
+        scanner.next();
+    }
+
+    private void printAllTasks() {
+        System.out.println("Задачи:");
+        for (Task task : taskManager.getTasks()) {
+            System.out.println(task);
+        }
+
+        System.out.println("Эпики:");
+        for (Epic epic : taskManager.getEpics()) {
+            System.out.println(epic);
+
+            for (Subtask task : taskManager.getSubtasksByEpic(epic)) {
+                System.out.println("--> " + task);
+            }
+        }
+        System.out.println("Подзадачи:");
+        for (Subtask subtask : taskManager.getSubtasks()) {
+            System.out.println(subtask);
+        }
+
+        System.out.println("История:");
+        for (Task task : historyManager.getHistory()){
+            System.out.println(task);
+        }
 
         System.out.print("Next...");
         scanner.next();

@@ -8,7 +8,9 @@ import tracker.model.tasks.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class InMemoryTaskManager implements TaskManager {
+//Поставил модификатор доступа по умолчанию.
+//Создавать объекты класса InMemoryTaskManager только в Managers.
+class InMemoryTaskManager implements TaskManager {
 
     private static int id = 0;
 
@@ -70,7 +72,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskByID(int id) {
         if (!tasks.containsKey(id)) return null;
 
-        return tasks.get(id);
+        Task task = tasks.get(id);
+
+        Managers.getDefaultHistory().add(task); //просмотр задачи
+
+        return task;
     }
 
     /// Подзадачи.
@@ -78,7 +84,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtaskByID(int id) {
         if (!subtasks.containsKey(id)) return null;
 
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+
+        Managers.getDefaultHistory().add(subtask);  //просмотр подзадачи
+
+        return subtask;
     }
 
     /// Эпика.
@@ -86,7 +96,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicByID(int id) {
         if (!epics.containsKey(id)) return null;
 
-        return epics.get(id);
+        Epic epic = epics.get(id);
+
+        Managers.getDefaultHistory().add(epic); //просмотр эпика
+
+        return epic;
     }
     //endregion
 
