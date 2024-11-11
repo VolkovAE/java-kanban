@@ -1,6 +1,6 @@
 package tracker.services;
 
-import tracker.model.enums.STATUS;
+import tracker.model.enums.Status;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
@@ -100,8 +100,8 @@ public class TaskManager {
 
         Epic epic = subtask.getEpic();
 
-        if (epic.getStatus() == STATUS.DONE) {  //если эпик закрыт, то при добавлении подзадачи откроем его повторно
-            epic.setStatus(STATUS.IN_PROGRESS);
+        if (epic.getStatus() == Status.DONE) {  //если эпик закрыт, то при добавлении подзадачи откроем его повторно
+            epic.setStatus(Status.IN_PROGRESS);
         }
 
         epic.getSubtasks().add(subtask);    //добавление подзадачи в эпик
@@ -253,8 +253,8 @@ public class TaskManager {
     /// Маршрут: STATUS.NEW -> STATUS.IN_PROGRESS -> STATUS.DONE
     private void updateStatusTask(Task task) {
         switch (task.getStatus()) {
-            case NEW -> task.setStatus(STATUS.IN_PROGRESS);
-            case IN_PROGRESS -> task.setStatus(STATUS.DONE);
+            case NEW -> task.setStatus(Status.IN_PROGRESS);
+            case IN_PROGRESS -> task.setStatus(Status.DONE);
         }
     }
 
@@ -276,7 +276,7 @@ public class TaskManager {
         for (Subtask subtask : subtasks) {
             switch (subtask.getStatus()) {
                 case IN_PROGRESS -> {
-                    epic.setStatus(STATUS.IN_PROGRESS); //одна в работе, эпик в работе
+                    epic.setStatus(Status.IN_PROGRESS); //одна в работе, эпик в работе
                     return;
                 }
                 case NEW -> {
@@ -289,9 +289,9 @@ public class TaskManager {
         }
 
         //Нет подзадач в статусе STATUS.IN_PROGRESS.
-        if ((isNew) && (isDone)) epic.setStatus(STATUS.IN_PROGRESS);    //есть и new и done подзадачи
-        else if ((!isNew) && (isDone)) epic.setStatus(STATUS.DONE); //все подзадачи закрыты
-        else epic.setStatus(STATUS.NEW);    //или только открытые подзадачи или нет подзадач
+        if ((isNew) && (isDone)) epic.setStatus(Status.IN_PROGRESS);    //есть и new и done подзадачи
+        else if ((!isNew) && (isDone)) epic.setStatus(Status.DONE); //все подзадачи закрыты
+        else epic.setStatus(Status.NEW);    //или только открытые подзадачи или нет подзадач
     }
     //endregion
 }

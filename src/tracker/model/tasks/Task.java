@@ -1,10 +1,10 @@
 package tracker.model.tasks;
 
-import tracker.model.enums.STATUS;
+import tracker.model.enums.Status;
 
 public class Task {
 
-    private STATUS status = STATUS.NEW;
+    private Status status = Status.NEW;
     private int id;
 
     protected String name;
@@ -31,11 +31,11 @@ public class Task {
         this.id = id;
     }
 
-    public STATUS getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(STATUS status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
