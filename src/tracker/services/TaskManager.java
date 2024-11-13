@@ -34,27 +34,27 @@ public interface TaskManager {
     //endregion
 
     //region d. Создание. Сам объект должен передаваться в качестве параметра.
-    void addTask(Task task);
+    int addTask(Task task);
 
-    void addSubtask(Subtask subtask);
+    int addSubtask(Subtask subtask);
 
-    void addEpic(Epic epic);
+    int addEpic(Epic epic);
     //endregion
 
     //region e. Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    void updateTask(Task task);
+    boolean updateTask(Task task);
 
-    void updateSubtask(Subtask subtask);
+    boolean updateSubtask(Subtask subtask);
 
-    void updateEpic(Epic epic);
+    boolean updateEpic(Epic epic);
     //endregion
 
     //region f. Удаление по идентификатору.
-    void delTaskByID(int id);
+    Task delTaskByID(int id);
 
-    void delSubtaskByID(int id);
+    Subtask delSubtaskByID(int id);
 
-    void delEpicByID(int id);
+    Epic delEpicByID(int id);
     //endregion
 
     //region Дополнительные методы.

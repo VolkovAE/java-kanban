@@ -2,7 +2,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import tracker.services.Managers;
 
-public class ManagersTestExt {
+public class ManagersTest {
 
     @Test
     public void shouldGetDefaultIsNotNull() {
