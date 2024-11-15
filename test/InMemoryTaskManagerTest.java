@@ -290,17 +290,17 @@ public class InMemoryTaskManagerTest {
         List<Task> history = historyManager.getHistory();
         assertFalse(history.contains(epicDel), "Эпик не удален из истории.");
 
-        isDelSubtasks = true;
+        boolean isDelHistory = true;
         for (Task task : history) {
             if (task instanceof Subtask) {
                 if (((Subtask) task).getEpic().equals(epicDel)) {
-                    isDelSubtasks = false;
+                    isDelHistory = false;
 
                     break;
                 }
             }
         }
-        assertTrue(isDelSubtasks, "Подзадачи эпика не удалены из истории.");
+        assertTrue(isDelHistory, "Подзадачи эпика не удалены из истории.");
     }
 
     @Test
