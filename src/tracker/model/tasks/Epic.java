@@ -53,13 +53,13 @@ public class Epic extends Task {
                 ", status=" + getStatus() +
                 '}';
 
-        String infoSubtask = "";
+        StringBuilder infoSubtask = new StringBuilder();
         for (Subtask subtask : subtasks) {
-            infoSubtask += "                " + subtask + "\n";
+            infoSubtask.append("                ").append(subtask).append("\n");
         }
 
-        if (infoSubtask.isEmpty()) infoSubtask = "          Подзадач нет.";
-        else infoSubtask = "            Подзадачи:\n" + infoSubtask;
+        if (infoSubtask.isEmpty()) infoSubtask = new StringBuilder("          Подзадач нет.");
+        else infoSubtask.insert(0, "            Подзадачи:\n");
 
         info += "\n" + infoSubtask;
 
