@@ -98,7 +98,7 @@ class InMemoryTaskManager implements TaskManager {
 
         Task task = tasks.get(id);
 
-        Managers.getDefaultHistory().add(task); //просмотр задачи
+        historyManager.add(task);   //просмотр задачи
 
         return task;
     }
@@ -110,7 +110,7 @@ class InMemoryTaskManager implements TaskManager {
 
         Subtask subtask = subtasks.get(id);
 
-        Managers.getDefaultHistory().add(subtask);  //просмотр подзадачи
+        historyManager.add(subtask);    //просмотр подзадачи
 
         return subtask;
     }
@@ -122,7 +122,7 @@ class InMemoryTaskManager implements TaskManager {
 
         Epic epic = epics.get(id);
 
-        Managers.getDefaultHistory().add(epic); //просмотр эпика
+        historyManager.add(epic);   //просмотр эпика
 
         return epic;
     }
@@ -372,6 +372,13 @@ class InMemoryTaskManager implements TaskManager {
         if ((isNew) && (isDone)) epic.setStatus(Status.IN_PROGRESS);    //есть и new и done подзадачи
         else if ((!isNew) && (isDone)) epic.setStatus(Status.DONE); //все подзадачи закрыты
         else epic.setStatus(Status.NEW);    //или только открытые подзадачи или нет подзадач
+    }
+    //endregion
+
+    //region Методы истории данного менеджера задач.
+    @Override
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
     //endregion
 }

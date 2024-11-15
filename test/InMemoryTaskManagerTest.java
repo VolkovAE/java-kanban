@@ -15,7 +15,7 @@ import static tracker.model.enums.Status.*;
 
 public class InMemoryTaskManagerTest {
     private static final TaskManager taskManager = Managers.getDefault();
-    private static final HistoryManager historyManager = Managers.getDefaultHistory();
+    private static final HistoryManager historyManager = taskManager.getHistoryManager();
 
     @BeforeAll
     public static void init() {

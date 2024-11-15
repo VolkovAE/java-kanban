@@ -61,5 +61,7 @@ public interface TaskManager {
 
     /// a. Получение списка всех подзадач определённого эпика.
     List<Subtask> getSubtasksByEpic(Epic epic);
+
+    HistoryManager getHistoryManager();
     //endregion
 }

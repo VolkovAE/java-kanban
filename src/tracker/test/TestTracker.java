@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class TestTracker {
     private final TaskManager taskManager = Managers.getDefault();  //получаем объект одного из менеджеров
-    private final HistoryManager historyManager = Managers.getDefaultHistory(); //получаем объект одного из менеджеров
+    private final HistoryManager historyManager = taskManager.getHistoryManager();
 
     private final Scanner scanner = new Scanner(System.in);
 
@@ -147,7 +147,7 @@ public class TestTracker {
         }
 
         System.out.println("История:");
-        for (Task task : historyManager.getHistory()){
+        for (Task task : historyManager.getHistory()) {
             System.out.println(task);
         }
 
