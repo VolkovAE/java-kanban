@@ -86,7 +86,7 @@ public class InMemoryTaskManagerTest {
         String descr = "Описание задачи 1";
 
         Task task = new Task(name, descr);
-        int id = taskManager.addTask(task);
+        taskManager.addTask(task);
 
         taskManager.delAllTasks();
 
@@ -196,7 +196,7 @@ public class InMemoryTaskManagerTest {
         String descrSub = "Описание подзадачи 1";
 
         Subtask subtask = new Subtask(nameSub, descrSub, epic);
-        int id = taskManager.addSubtask(subtask);
+        taskManager.addSubtask(subtask);
 
         taskManager.delAllSubtasks();
 
@@ -310,7 +310,7 @@ public class InMemoryTaskManagerTest {
 
         Epic epic = new Epic(nameEpic, descrEpic);
 
-        int id = taskManager.addEpic(epic);
+        taskManager.addEpic(epic);
 
         taskManager.delAllEpics();
 

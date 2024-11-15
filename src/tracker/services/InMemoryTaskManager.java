@@ -359,12 +359,8 @@ class InMemoryTaskManager implements TaskManager {
                     epic.setStatus(Status.IN_PROGRESS); //одна в работе, эпик в работе
                     return;
                 }
-                case NEW -> {
-                    isNew = true;   //запоминаем наличие задач в статусе NEW
-                }
-                case DONE -> {
-                    isDone = true;  //запоминаем наличие задач в статусе DONE
-                }
+                case NEW -> isNew = true;   //запоминаем наличие задач в статусе NEW
+                case DONE -> isDone = true;  //запоминаем наличие задач в статусе DONE
             }
         }
 
