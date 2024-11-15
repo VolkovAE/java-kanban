@@ -4,17 +4,17 @@ import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     /* Методы для каждого из типа задач(Задача/Эпик/Подзадача): */
 
     //region a. Получение списка всех задач.
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
-    ArrayList<Subtask> getSubtasks();
+    List<Subtask> getSubtasks();
 
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
     //endregion
 
     //region b. Удаление всех задач.
@@ -60,6 +60,6 @@ public interface TaskManager {
     //region Дополнительные методы.
 
     /// a. Получение списка всех подзадач определённого эпика.
-    ArrayList<Subtask> getSubtasksByEpic(Epic epic);
+    List<Subtask> getSubtasksByEpic(Epic epic);
     //endregion
 }

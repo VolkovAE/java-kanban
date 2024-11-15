@@ -7,6 +7,7 @@ import tracker.services.Managers;
 import tracker.services.TaskManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,7 +42,7 @@ public class InMemoryHistoryManagerTest {
         int id_task2 = taskManager.addTask(task2);
         int id_task3 = taskManager.addTask(task3);
 
-        ArrayList<Task> test = new ArrayList<>();
+        List<Task> test = new ArrayList<>();
         test.add(task3);
         test.add(epic1);
         test.add(epic2);
@@ -53,7 +54,7 @@ public class InMemoryHistoryManagerTest {
         test.add(task2);
         test.add(task3);
 
-        ArrayList<Task> testDel = new ArrayList<>();
+        List<Task> testDel = new ArrayList<>();
         testDel.add(task3);
         testDel.add(epic1);
         testDel.add(epic3);
@@ -87,7 +88,7 @@ public class InMemoryHistoryManagerTest {
         taskManager.getTaskByID(id_task3);
 
         //Проверка.
-        ArrayList<Task> tasks = historyManager.getHistory();
+        List<Task> tasks = historyManager.getHistory();
 
         assertEquals(HistoryManager.MAX_SIZE_HISTORY, tasks.size(),
                 "Количество элементов в истории больше " + HistoryManager.MAX_SIZE_HISTORY);

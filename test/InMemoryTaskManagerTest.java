@@ -8,6 +8,7 @@ import tracker.services.Managers;
 import tracker.services.TaskManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static tracker.model.enums.Status.*;
@@ -71,11 +72,11 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(task, taskDel, "Не возвращена ссылка на удаляемую задачу.");
 
-        ArrayList<Task> tasks = taskManager.getTasks();
+        List<Task> tasks = taskManager.getTasks();
 
         assertFalse(tasks.contains(task), "Задача не удалена.");
 
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
         assertFalse(history.contains(task), "Задача не удалена из истории.");
     }
 
@@ -172,7 +173,7 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(subtask, subtaskDel, "Не возвращена ссылка на удаляемую подзадачу.");
 
-        ArrayList<Subtask> subtasks = taskManager.getSubtasks();
+        List<Subtask> subtasks = taskManager.getSubtasks();
 
         assertFalse(subtasks.contains(subtask), "Подзадача не удалена.");
 
@@ -180,7 +181,7 @@ public class InMemoryTaskManagerTest {
 
         assertFalse(subtasks.contains(subtask), "Подзадача не удалена из эпика.");
 
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
         assertFalse(history.contains(subtask), "Подзадача не удалена из истории.");
     }
 
@@ -203,7 +204,7 @@ public class InMemoryTaskManagerTest {
 
         boolean isClear = true;
         for (Epic e : taskManager.getEpics()) {
-            ArrayList<Subtask> subtasks = e.getSubtasks();
+            List<Subtask> subtasks = e.getSubtasks();
 
             if (!subtasks.isEmpty()) {
                 isClear = false;
@@ -272,7 +273,7 @@ public class InMemoryTaskManagerTest {
 
         assertTrue(epicDel.getSubtasks().isEmpty(), "Список подзадач эпика не пустой.");
 
-        ArrayList<Epic> epics = taskManager.getEpics();
+        List<Epic> epics = taskManager.getEpics();
 
         assertFalse(epics.contains(epic), "Эпик не удален.");
 
@@ -286,7 +287,7 @@ public class InMemoryTaskManagerTest {
         }
         assertTrue(isDelSubtasks, "Подзадачи эпика не удалены из списка подзадач.");
 
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
         assertFalse(history.contains(epicDel), "Эпик не удален из истории.");
 
         isDelSubtasks = true;
@@ -332,12 +333,12 @@ public class InMemoryTaskManagerTest {
         Subtask subtask = new Subtask(nameSub, descrSub, epic);
         taskManager.addSubtask(subtask);
 
-        ArrayList<Subtask> subtasks = new ArrayList<>();
+        List<Subtask> subtasks = new ArrayList<>();
         for (Subtask o : taskManager.getSubtasks()) {
             if (o.getEpic().equals(epic)) subtasks.add(o);
         }
 
-        ArrayList<Subtask> subtasksEpic = taskManager.getSubtasksByEpic(epic);
+        List<Subtask> subtasksEpic = taskManager.getSubtasksByEpic(epic);
 
         assertEquals(subtasks, subtasksEpic, "Список подзадач эпика не соответствует списку подзадач.");
     }

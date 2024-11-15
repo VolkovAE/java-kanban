@@ -1,15 +1,14 @@
 package tracker.services;
 
-import tracker.model.tasks.Epic;
-import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 //Поставил модификатор доступа по умолчанию.
 //Создавать объекты класса InMemoryTaskManager только в Managers.
 class InMemoryHistoryManager implements HistoryManager {
-    private final ArrayList<Task> history = new ArrayList<>();
+    private final List<Task> history = new ArrayList<>();
 
     @Override
     public void add(Task task) {
@@ -21,7 +20,7 @@ class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
+    public List<Task> getHistory() {
         return new ArrayList<>(history);    //не даем работать с оригинальным списком, с объектами списка да
     }
 

@@ -7,6 +7,8 @@ import tracker.model.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //Поставил модификатор доступа по умолчанию.
 //Создавать объекты класса InMemoryTaskManager только в Managers.
@@ -14,9 +16,9 @@ class InMemoryTaskManager implements TaskManager {
 
     private static int id = 0;
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Subtask> subtasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
 
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
@@ -26,19 +28,19 @@ class InMemoryTaskManager implements TaskManager {
 
     /// Список задач.
     @Override
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
 
     /// Список подзадач.
     @Override
-    public ArrayList<Subtask> getSubtasks() {
+    public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
     /// Список эпиков.
     @Override
-    public ArrayList<Epic> getEpics() {
+    public List<Epic> getEpics() {
         return new ArrayList<>(epics.values());
     }
     //endregion
@@ -261,7 +263,7 @@ class InMemoryTaskManager implements TaskManager {
         //  присвоили эпику ссылку на новый список задач
         Subtask subtask = subtasks.get(id);
         Epic epic = subtask.getEpic();
-        ArrayList<Subtask> subtaskArrayList = epic.getSubtasks();
+        List<Subtask> subtaskArrayList = epic.getSubtasks();
         subtaskArrayList.remove(subtask);
         epic.setSubtasks(subtaskArrayList);
 
@@ -283,7 +285,7 @@ class InMemoryTaskManager implements TaskManager {
 
         //Удаляем все подзадачи эпика.
         Epic epic = getEpicByID(id);
-        ArrayList<Subtask> subtasksByEpic = epic.getSubtasks(); //getSubtasksByEpic(epic);
+        List<Subtask> subtasksByEpic = epic.getSubtasks(); //getSubtasksByEpic(epic);
 
         for (Subtask subtask : subtasksByEpic) {    //оставил, потому что удаляю ссылки на подзадачи из subtasks
             subtasks.remove(subtask.getId());
@@ -305,7 +307,7 @@ class InMemoryTaskManager implements TaskManager {
 
     /// a. Получение списка всех подзадач определённого эпика.
     @Override
-    public ArrayList<Subtask> getSubtasksByEpic(Epic epic) {
+    public List<Subtask> getSubtasksByEpic(Epic epic) {
         /*
         ArrayList<Subtask> subtasksByEpic = new ArrayList<>();
 
@@ -350,7 +352,7 @@ class InMemoryTaskManager implements TaskManager {
         boolean isNew = false;
         boolean isDone = false;
 
-        ArrayList<Subtask> subtasks = getSubtasksByEpic(epic);
+        List<Subtask> subtasks = getSubtasksByEpic(epic);
         for (Subtask subtask : subtasks) {
             switch (subtask.getStatus()) {
                 case IN_PROGRESS -> {
