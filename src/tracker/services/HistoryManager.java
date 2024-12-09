@@ -9,7 +9,7 @@ public interface HistoryManager {
 
     void add(Task task);    //помечает задачи как просмотренные
 
-    List<Task> getHistory();    //возвращет список просмотренных задач (история)
+    List<Task> getHistory();    //возвращает список просмотренных задач (история)
 
     <T> void delTask(T task);   //удаляем задачу из истории
 }
