@@ -11,5 +11,5 @@ public interface HistoryManager {
 
     List<Task> getHistory();    //возвращает список просмотренных задач (история)
 
-    <T> void delTask(T task);   //удаляем задачу из истории
+    void remove(int id);    //удаляет задачу из истории
 }

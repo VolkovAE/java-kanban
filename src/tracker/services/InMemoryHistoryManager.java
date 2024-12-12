@@ -25,7 +25,7 @@ class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public <T> void delTask(T task) {
-        history.removeIf(x -> (x.equals(task)));
+    public void remove(int id) {
+
     }
 }

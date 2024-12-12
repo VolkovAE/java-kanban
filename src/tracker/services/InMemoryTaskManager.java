@@ -55,7 +55,7 @@ class InMemoryTaskManager implements TaskManager {
     @Override
     public void delAllTasks() {
         for (Task task : tasks.values()) {
-            historyManager.delTask(task);
+            historyManager.remove(task.getId());
         }
 
         tasks.clear();
@@ -65,7 +65,7 @@ class InMemoryTaskManager implements TaskManager {
     @Override
     public void delAllSubtasks() {
         for (Subtask subtask : subtasks.values()) {
-            historyManager.delTask(subtask);
+            historyManager.remove(subtask.getId());
         }
 
         subtasks.clear();
@@ -77,11 +77,11 @@ class InMemoryTaskManager implements TaskManager {
     @Override
     public void delAllEpics() {
         for (Subtask subtask : subtasks.values()) {
-            historyManager.delTask(subtask);
+            historyManager.remove(subtask.getId());
         }
 
         for (Epic epic : epics.values()) {
-            historyManager.delTask(epic);
+            historyManager.remove(epic.getId());
         }
 
         subtasks.clear();
@@ -251,7 +251,7 @@ class InMemoryTaskManager implements TaskManager {
 
         tasks.remove(id);
 
-        historyManager.delTask(task);   //удаляем задачу из истории просмотров
+        historyManager.remove(task.getId());    //удаляем задачу из истории просмотров
 
         return task;
     }
@@ -274,7 +274,7 @@ class InMemoryTaskManager implements TaskManager {
         //Удаляем саму подзадачу.
         subtasks.remove(id);
 
-        historyManager.delTask(subtask);    //удаляем подзадачу из истории просмотров
+        historyManager.remove(subtask.getId()); //удаляем подзадачу из истории просмотров
 
         //Обновляем статус эпика (по оставшимся подзадачам).
         updateStatusEpic(epic);
@@ -293,7 +293,7 @@ class InMemoryTaskManager implements TaskManager {
 
         for (Subtask subtask : subtasksByEpic) {    //оставил, потому что удаляю ссылки на подзадачи из subtasks
             subtasks.remove(subtask.getId());
-            historyManager.delTask(subtask);    //удаляем подзадачу из истории просмотров
+            historyManager.remove(subtask.getId()); //удаляем подзадачу из истории просмотров
         }
 
         epic.setSubtasks(); //удаляю ссылки на подзадачи из списка подзадач удаляемого эпика (сделал в сеттере)
@@ -301,7 +301,7 @@ class InMemoryTaskManager implements TaskManager {
         //После удаления подзадач, удаляем сам эпик.
         epics.remove(id);
 
-        historyManager.delTask(epic);   //удаляем эпик из истории просмотров
+        historyManager.remove(epic.getId());    //удаляем эпик из истории просмотров
 
         return epic;
     }
