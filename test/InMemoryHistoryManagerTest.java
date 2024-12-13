@@ -43,7 +43,6 @@ public class InMemoryHistoryManagerTest {
         int id_task3 = taskManager.addTask(task3);
 
         List<Task> test = new ArrayList<>();
-        test.add(task3);
         test.add(epic1);
         test.add(epic2);
         test.add(epic3);
@@ -55,7 +54,6 @@ public class InMemoryHistoryManagerTest {
         test.add(task3);
 
         List<Task> testDel = new ArrayList<>();
-        testDel.add(task3);
         testDel.add(epic1);
         testDel.add(epic3);
         testDel.add(subtask3);
@@ -87,11 +85,12 @@ public class InMemoryHistoryManagerTest {
         taskManager.getTaskByID(id_task2);
         taskManager.getTaskByID(id_task3);
 
-        //Проверка.
+        //Проверка (история с использовнием двусвязного списка).
         List<Task> tasks = historyManager.getHistory();
 
-        assertEquals(HistoryManager.MAX_SIZE_HISTORY, tasks.size(),
-                "Количество элементов в истории больше " + HistoryManager.MAX_SIZE_HISTORY);
+        int countTest = 9;
+        assertEquals(countTest, tasks.size(),
+                "Количество элементов в истории больше " + countTest);
 
         assertEquals(test, tasks, "История прочтения задач не верна.");
 
