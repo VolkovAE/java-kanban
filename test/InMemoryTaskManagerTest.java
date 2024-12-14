@@ -10,8 +10,13 @@ import tracker.services.TaskManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static tracker.model.enums.Status.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static tracker.model.enums.Status.NEW;
+import static tracker.model.enums.Status.IN_PROGRESS;
+import static tracker.model.enums.Status.DONE;
 
 public class InMemoryTaskManagerTest {
     private static final TaskManager taskManager = Managers.getDefault();
