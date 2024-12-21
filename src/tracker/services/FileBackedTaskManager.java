@@ -8,6 +8,7 @@ import tracker.services.enums.TypeTask;
 import tracker.services.exceptions.ManagerSaveException;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +23,8 @@ import static tracker.model.enums.Status.DONE;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private Path fileNameSave;
+    private final Path fileNameSave;
+    private static final Charset encoding = StandardCharsets.UTF_8;
 
     FileBackedTaskManager(HistoryManager historyManager, Path fileNameSave) {
         super(historyManager);
@@ -36,8 +38,62 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.fileNameSave = Paths.get(fileNameSave);
     }
 
+    FileBackedTaskManager(HistoryManager historyManager, File file) {
+        super(historyManager);
+
+        this.fileNameSave = file.toPath();
+    }
+
+    public Path getFileNameSave() {
+        return fileNameSave;
+    }
+
+    //region Функционал записи/чтения задач в/из файл(а).
+
+    /// Восстановление данных менеджера из файла при запуске программы.
+    public static FileBackedTaskManager loadFromFile(Path file) {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(Managers.getDefaultHistory(), file);
+
+        try (FileReader fileReader = new FileReader(fileBackedTaskManager.getFileNameSave().toString(), encoding);
+             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+
+            int maxId = 0;
+
+            while (bufferedReader.ready()) {
+                String str = bufferedReader.readLine();
+
+                Task task = fileBackedTaskManager.fromString(str);
+
+                if (task instanceof Epic) {
+                    fileBackedTaskManager.addEpic((Epic) task);
+                } else if (task instanceof Subtask) {
+                    fileBackedTaskManager.addSubtask((Subtask) task);
+                } else {
+                    fileBackedTaskManager.addTask(task);
+                }
+
+                if (task.getId() > maxId) maxId = task.getId();
+            }
+
+            fileBackedTaskManager.setId(maxId);
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка чтения файла задач:\n" + e.getMessage());
+        }
+
+        return fileBackedTaskManager;
+    }
+
+    public static FileBackedTaskManager loadFromFile(String file) {
+        return loadFromFile(Paths.get(file));
+    }
+
+    public static FileBackedTaskManager loadFromFile(File file) {
+        return loadFromFile(file.toPath());
+    }
+
+    /// Сохраняет все задачи, подзадачи и эпики в файл.
     private void save() {
-        try (FileWriter fileWriter = new FileWriter(fileNameSave.toString(), StandardCharsets.UTF_8);
+        try (FileWriter fileWriter = new FileWriter(fileNameSave.toString(), encoding);
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
 
             List<Task> tasks = getTasks();
@@ -52,7 +108,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
             bufferedWriter.flush();
         } catch (IOException e) {
-            throw new ManagerSaveException(e.getMessage());
+            throw new ManagerSaveException("Ошибка записи задач в файл:\n" + e.getMessage());
         }
     }
 
@@ -107,6 +163,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         return task;
     }
+    //endregion Функционал записи/чтения задач в/из файл(а).
 
     //region Переопределение методов InMemoryTaskManager
     @Override
@@ -129,24 +186,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public int addTask(Task task) {
-        int id = super.addTask(task);
-        save();
+        int id = task.getId();
+
+        if (id == 0) {  //добавляем новую задачу
+            id = super.addTask(task);
+            save();
+        } else {    //задача десериализована
+            tasks.put(id, task);
+        }
 
         return id;
     }
 
     @Override
     public int addSubtask(Subtask subtask) {
-        int id = super.addSubtask(subtask);
-        save();
+        int id = subtask.getId();
+
+        if (id == 0) {  //добавляем новую подзадачу
+            id = super.addSubtask(subtask);
+            save();
+        } else {    //подзадача десериализована
+            subtasks.put(id, subtask);
+        }
 
         return id;
     }
 
     @Override
     public int addEpic(Epic epic) {
-        int id = super.addEpic(epic);
-        save();
+        int id = epic.getId();
+
+        if (id == 0) {  //добавляем новый эпик
+            id = super.addEpic(epic);
+            save();
+        } else {    //эпик десериализован
+            epics.put(id, epic);
+        }
 
         return id;
     }
