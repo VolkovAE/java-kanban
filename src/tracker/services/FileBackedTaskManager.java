@@ -5,9 +5,13 @@ import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 import tracker.services.enums.TypeTask;
+import tracker.services.exceptions.ManagerSaveException;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static tracker.services.enums.TypeTask.TASK;
 import static tracker.services.enums.TypeTask.SUBTASK;
@@ -33,6 +37,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
+        try (FileWriter fileWriter = new FileWriter(fileNameSave.toString(), StandardCharsets.UTF_8);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
+            List<Task> tasks = getTasks();
+            tasks.addAll(getEpics());
+            tasks.addAll(getSubtasks());
+
+            for (Task task : tasks) {
+                String str = toString(task);
+
+                bufferedWriter.write(str);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.flush();
+        } catch (IOException e) {
+            throw new ManagerSaveException(e.getMessage());
+        }
     }
 
     /// Сохранение задачи в строку.
