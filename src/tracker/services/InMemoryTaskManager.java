@@ -14,7 +14,7 @@ import java.util.Map;
 //Создавать объекты класса InMemoryTaskManager только в Managers.
 class InMemoryTaskManager implements TaskManager {
 
-    private static int id = 0;
+    protected static int id = 0;
 
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();

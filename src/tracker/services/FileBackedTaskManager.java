@@ -1,11 +1,20 @@
 package tracker.services;
 
+import tracker.model.enums.Status;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
+import tracker.services.enums.TypeTask;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static tracker.services.enums.TypeTask.TASK;
+import static tracker.services.enums.TypeTask.SUBTASK;
+import static tracker.services.enums.TypeTask.EPIC;
+
+import static tracker.model.enums.Status.IN_PROGRESS;
+import static tracker.model.enums.Status.DONE;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -24,6 +33,58 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
+    }
+
+    /// Сохранение задачи в строку.
+    private String toString(Task task) {
+
+        TypeTask typeTask;
+        if (task instanceof Epic) typeTask = EPIC;
+        else if (task instanceof Subtask) typeTask = SUBTASK;
+        else typeTask = TASK;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(task.getId());
+        stringBuilder.append(",");
+        stringBuilder.append(typeTask.toString());
+        stringBuilder.append(",");
+        stringBuilder.append(task.getName());
+        stringBuilder.append(",");
+        stringBuilder.append(task.getStatus().toString());
+        stringBuilder.append(",");
+        stringBuilder.append(task.getDescr());
+        stringBuilder.append(",");
+        if (typeTask == SUBTASK) stringBuilder.append(((Subtask) task).getEpic().getId());
+
+        return stringBuilder.toString();
+    }
+
+    /// Создание задачи из строки.
+    Task fromString(String value) {
+        String[] arr = value.split(",");   //0-id, 1-Type, 2-Name, 3-Status, 4-Descr, 5-Epic (если тип Subtask)
+
+        Task task;
+
+        if (arr[1].equals("EPIC")) {
+            task = new Epic(arr[2], arr[4]);
+        } else if (arr[1].equals("TASK")) {
+            task = new Task(arr[2], arr[4]);
+        } else if (arr[1].equals("SUBTASK")) {
+            task = new Subtask(arr[2], arr[4], this.getEpicByID(Integer.parseInt(arr[5])));
+        } else {
+            return null;
+        }
+
+        Status status;
+        if (arr[3].equals("IN_PROGRESS")) {
+            task.setStatus(IN_PROGRESS);
+        } else if (arr[3].equals("DONE")) {
+            task.setStatus(DONE);
+        }
+
+        task.setId(Integer.parseInt(arr[0]));
+
+        return task;
     }
 
     //region Переопределение методов InMemoryTaskManager
