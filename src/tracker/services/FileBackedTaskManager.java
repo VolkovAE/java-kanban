@@ -51,7 +51,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     //region Функционал записи/чтения задач в/из файл(а).
 
     /// Восстановление данных менеджера из файла при запуске программы.
-    public static FileBackedTaskManager loadFromFile(Path file) {
+    public static FileBackedTaskManager loadFromFile(Path file) throws ManagerSaveException {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(Managers.getDefaultHistory(), file);
 
         try (FileReader fileReader = new FileReader(fileBackedTaskManager.getFileNameSave().toString(), encoding);
