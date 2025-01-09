@@ -14,16 +14,24 @@ import java.util.Map;
 //Создавать объекты класса InMemoryTaskManager только в Managers.
 class InMemoryTaskManager implements TaskManager {
 
-    private static int id = 0;
+    private int id = 0;
 
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
 
     private final HistoryManager historyManager;
 
     InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /* Методы для каждого из типа задач(Задача/Эпик/Подзадача): */
@@ -155,7 +163,7 @@ class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.IN_PROGRESS);
         }
 
-        epic.getSubtasks().add(subtask);    //добавление подзадачи в эпик
+        //epic.getSubtasks().add(subtask);    //добавление подзадачи в эпик - ошибка
 
         return id;  //0 - зарезервировано для случая ошибки
     }
