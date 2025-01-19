@@ -12,7 +12,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import static tracker.services.enums.TypeTask.TASK;
 import static tracker.services.enums.TypeTask.SUBTASK;
@@ -121,35 +124,60 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         else typeTask = TASK;
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(task.getId());
-        stringBuilder.append(",");
-        stringBuilder.append(typeTask.toString());
-        stringBuilder.append(",");
-        stringBuilder.append(task.getName());
-        stringBuilder.append(",");
-        stringBuilder.append(task.getStatus().toString());
-        stringBuilder.append(",");
-        stringBuilder.append(task.getDescr());
-        stringBuilder.append(",");
-        if (typeTask == SUBTASK) stringBuilder.append(((Subtask) task).getEpic().getId());
+        appendValueToBuilder(stringBuilder, task.getId(), true);
+        appendValueToBuilder(stringBuilder, typeTask.toString(), true);
+        appendValueToBuilder(stringBuilder, task.getName(), true);
+        appendValueToBuilder(stringBuilder, task.getStatus().toString(), true);
+        appendValueToBuilder(stringBuilder, task.getDescr(), true);
+
+        if (typeTask == SUBTASK) {
+            appendValueToBuilder(stringBuilder, ((Subtask) task).getEpic().getId(), true);
+        } else {
+            appendValueToBuilder(stringBuilder, getEmptyValue(), true);
+        }
+
+        //startTime
+        DateTimeFormatter formatter = getPatternFormatLDT();
+        Optional<LocalDateTime> startTime = task.getStartTime();
+        if (startTime.isPresent()) {
+            appendValueToBuilder(stringBuilder, startTime.get().format(formatter), true);
+        } else {
+            appendValueToBuilder(stringBuilder, getEmptyValue(), true);
+        }
+
+        //duration
+        appendValueToBuilder(stringBuilder, task.getDuration(), true);
+
+        //endTime
+        Optional<LocalDateTime> endTime = task.getEndTime();
+        if (endTime.isPresent()) {
+            appendValueToBuilder(stringBuilder, endTime.get().format(formatter), false);
+        } else {
+            appendValueToBuilder(stringBuilder, getEmptyValue(), false);
+        }
 
         return stringBuilder.toString();
     }
 
     /// Создание задачи из строки.
     Task fromString(String value) {
-        String[] arr = value.split(",");   //0-id, 1-Type, 2-Name, 3-Status, 4-Descr, 5-Epic (если тип Subtask)
+        String[] arr = value.split(getSeparator()); //0-id, 1-Type, 2-Name, 3-Status, 4-Descr, 5-Epic (если тип Subtask),
+        //6-startTime, 7-duration, 8-endTime (зарезервировано)
 
         Task task;
 
-        if (arr[1].equals("EPIC")) {
-            task = new Epic(arr[2], arr[4]);
-        } else if (arr[1].equals("TASK")) {
-            task = new Task(arr[2], arr[4]);
-        } else if (arr[1].equals("SUBTASK")) {
-            task = new Subtask(arr[2], arr[4], this.getEpicByID(Integer.parseInt(arr[5])));
-        } else {
-            return null;
+        LocalDateTime startTime = getStartEndTime(arr[6]);
+        int duration = Integer.parseInt(arr[7]);
+        //LocalDateTime endTime = getStartEndTime(arr[8]);    //зарезервировано
+
+        switch (arr[1]) {
+            case "EPIC" -> task = new Epic(arr[2], arr[4]);
+            case "TASK" -> task = new Task(arr[2], arr[4], startTime, duration);
+            case "SUBTASK" ->
+                    task = new Subtask(arr[2], arr[4], this.getEpicByID(Integer.parseInt(arr[5])), startTime, duration);
+            default -> {
+                return null;
+            }
         }
 
         Status status;
@@ -162,6 +190,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         task.setId(Integer.parseInt(arr[0]));
 
         return task;
+    }
+
+    private <T> void appendValueToBuilder(StringBuilder stringBuilder, T value, boolean isSeparator) {
+        stringBuilder.append(value);
+        if (isSeparator) stringBuilder.append(getSeparator());
+    }
+
+    private String getSeparator() {
+        return ",";
+    }
+
+    private String getEmptyValue() {
+        return "-";
+    }
+
+    private DateTimeFormatter getPatternFormatLDT() {
+        return DateTimeFormatter.ofPattern("dd.MM.yyyy|HH.mm.ss");
+    }
+
+    private LocalDateTime getStartEndTime(String value) {
+        if (value.equals(getEmptyValue())) return null;
+
+        return LocalDateTime.parse(value, getPatternFormatLDT());
     }
     //endregion Функционал записи/чтения задач в/из файл(а).
 

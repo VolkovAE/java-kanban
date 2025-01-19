@@ -7,6 +7,8 @@ import tracker.services.HistoryManager;
 import tracker.services.Managers;
 import tracker.services.TaskManager;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -400,5 +402,167 @@ public class InMemoryTaskManagerTest {
         Epic epic2 = taskManager.getEpicByID(id);
 
         assertEquals(epic1, epic2, "Эпики с одинаковыми идентификаторами не равны друг другу.");
+    }
+
+    @Test
+    public void checkPrioritizedTasks() {
+        //Проверка приоритизации задач.
+
+        //Порядок:
+        //  - создаем новый менеджер задач не использующий файловое хранилище
+        //  - создаем задачи:
+        //      - Task1
+        //      - Task2
+        //      - Epic1
+        //      - Subtask11(Epic1)
+        //      - Subtask12(Epic1)
+        //      - Epic2
+        //      - Subtask21(Epic2)
+
+        TaskManager taskManager = Managers.getDefault();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy|HH.mm.ss");
+
+        //Создаем две задачи, а также эпик с двумя подзадачами и эпик с одной подзадачей.
+        //id = 1
+        Task task1 = new Task("Задача 1", "Описание задачи 1.",
+                LocalDateTime.parse("17.01.2025|14.15.13", formatter), 10);
+        taskManager.addTask(task1);
+        //id = 2
+        Task task2 = new Task("Задача 2", "Описание задачи 2.",
+                LocalDateTime.parse("15.01.2025|02.03.51", formatter), 187);
+        taskManager.addTask(task2);
+
+        //id = 3
+        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1.");
+        taskManager.addEpic(epic1);
+
+        //id = 4
+        Subtask subtask11 = new Subtask("Подзадача 11", "Описание подзадачи 11.", epic1,
+                LocalDateTime.parse("14.01.2025|05.17.46", formatter), 15);
+        taskManager.addSubtask(subtask11);
+        //id = 5
+        Subtask subtask12 = new Subtask("Подзадача 12", "Описание подзадачи 12.", epic1);
+        taskManager.addSubtask(subtask12);
+
+        //id = 6
+        Epic epic2 = new Epic("Эпик 2", "Описание эпика 2.");
+        taskManager.addEpic(epic2);
+
+        //id = 7
+        Subtask subtask21 = new Subtask("Подзадача 21", "Описание подзадачи 21.", epic2,
+                LocalDateTime.parse("18.01.2025|09.25.16", formatter), 26);
+        taskManager.addSubtask(subtask21);
+
+        //Проверяем приоритизированный список задач после составления (добавление task/subtask).
+        List<Task> etalonAllTasks = List.of(subtask11, task2, task1, subtask21);
+
+        List<Task> tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после составления приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после удаления task1.
+        etalonAllTasks = List.of(subtask11, task2, subtask21);
+
+        taskManager.delTaskByID(task1.getId());
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после удаления задачи приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после удаления subtask11.
+        etalonAllTasks = List.of(task2, subtask21);
+
+        taskManager.delSubtaskByID(subtask11.getId());
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после удаления подзадачи приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после добавления task1 и subtask11.
+        etalonAllTasks = List.of(subtask11, task2, task1, subtask21);
+
+        taskManager.addTask(task1);
+        taskManager.addSubtask(subtask11);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после добавления задачи и подзадачи приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после удаления всех задач.
+        etalonAllTasks = List.of(subtask11, subtask21);
+
+        taskManager.delAllTasks();
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после удаления всех задач приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после удаления всех подзадач.
+        etalonAllTasks = List.of(task2, task1);
+
+        taskManager.addTask(task1);
+        taskManager.addTask(task2);
+        taskManager.delAllSubtasks();
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после удаления всех подзадач приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после изменения startTime в подзадаче.
+        etalonAllTasks = List.of(subtask21, subtask11, task2, task1);
+
+        taskManager.addSubtask(subtask11);
+        taskManager.addSubtask(subtask21);
+
+        LocalDateTime newStartTime = LocalDateTime.of(2_025, 1, 1, 0, 0, 0);
+        subtask21.setStartTime(newStartTime);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после изменения начала работ в подзадаче приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после изменения startTime в задаче.
+        etalonAllTasks = List.of(subtask21, task1, subtask11, task2);
+
+        newStartTime = LocalDateTime.of(2_025, 1, 10, 0, 0, 0);
+        task1.setStartTime(newStartTime);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после изменения начала работ в задаче приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после изменения startTime в задаче (в null).
+        etalonAllTasks = List.of(subtask21, subtask11, task2);
+
+        newStartTime = null;
+        task1.setStartTime(newStartTime);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после изменения начала работ (в null) в задаче приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после изменения startTime в задаче (из null).
+        etalonAllTasks = List.of(subtask21, task1, subtask11, task2);
+
+        newStartTime = LocalDateTime.of(2_025, 1, 10, 0, 0, 0);
+        task1.setStartTime(newStartTime);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после изменения начала работ (из null) в задаче приоритизирован не верно.");
+
+        //Проверяем приоритизированный список задач после удаления задачи и изменения у нее startTime (то что больше ее не слушаем).
+        etalonAllTasks = List.of(subtask21, subtask11, task2);
+
+        taskManager.delTaskByID(task1.getId());
+
+        newStartTime = LocalDateTime.of(2_025, 1, 17, 0, 0, 0);
+        task1.setStartTime(newStartTime);
+
+        tasksSortedByStartTime = taskManager.getPrioritizedTasks();
+
+        assertEquals(etalonAllTasks, tasksSortedByStartTime, "Список задач после удаления задачи и изменения у нее начала работ приоритизирован не верно.");
+
     }
 }
