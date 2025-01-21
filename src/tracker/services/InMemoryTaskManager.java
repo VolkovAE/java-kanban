@@ -5,12 +5,15 @@ import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 import tracker.services.enums.TypeTask;
+import tracker.services.exceptions.CrossTimeExecution;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,38 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
     };
 
     private TreeSet<Task> tasksSortedByStartTime = new TreeSet<>(taskComparatorByStartTime);
+
+    private final BiPredicate<Task, Task> isTasksCross = (task1, task2) -> {
+        //Проверка, что задачи task1 и task2 пересекаются или не пересекаются.
+        //Если startTime и/или endTime одной, или обеих задач равны null, то примем, что задачи не пересекаются.
+        //Результат:
+        //  - true - задачи пересекаются по времени выполнения
+        //  - false - задачи не пересекаются по времени выполнения
+
+        Optional<LocalDateTime> a = task1.getStartTime();
+        Optional<LocalDateTime> b = task1.getEndTime();
+        Optional<LocalDateTime> c = task2.getStartTime();
+        Optional<LocalDateTime> d = task2.getEndTime();
+
+        if (a.isEmpty() || b.isEmpty() || c.isEmpty() || d.isEmpty()) return false;
+
+        return (b.get().isAfter(c.get()) || b.get().equals(c.get())) &&
+                (d.get().isAfter(a.get()) || d.get().equals(a.get()));
+    };
+
+    private final Predicate<Task> isValidatedTaskCross = (Task task) -> {
+        //Получаем приоритизированный список задач по startTime, тем самым исключаем из обработки задачи, где не указано начало работ.
+        //Для каждого элемента проверяем пересечение с задачей task.
+        //Если хоть одна задача пересекается, то валидация не прошла.
+        //Результат:
+        //  - true - валидация времени выполнения задачи выполнена успешно
+        //  - false - валидация времение выполнения задачи не выполнена
+
+        boolean isCross = getPrioritizedTasks().stream()
+                .anyMatch((Task taskE) -> isTasksCross.test(taskE, task));
+
+        return !isCross;
+    };
 
     private final HistoryManager historyManager;
 
@@ -165,7 +200,9 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
 
     /// Задачи.
     @Override
-    public int addTask(Task task) {
+    public int addTask(Task task) throws CrossTimeExecution {
+        if (!isValidatedTaskCross.test(task))
+            throw new CrossTimeExecution("Добавляемая задача пересекается по времени выполнения.");
 
         task.setId(++id);
 
@@ -179,6 +216,8 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
     /// Подзадачи.
     @Override
     public int addSubtask(Subtask subtask) {
+        if (!isValidatedTaskCross.test(subtask))
+            throw new CrossTimeExecution("Добавляемая подзадача пересекается по времени выполнения.");
 
         subtask.setId(++id);
 
@@ -489,10 +528,15 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
             changedStartTimeTaskSubtask((Task) evt.getSource(),
                     (Optional<LocalDateTime>) evt.getOldValue(),
                     (Optional<LocalDateTime>) evt.getNewValue());
+        } else if (nameField.equals("duration")) {
+            changedDurationTaskSubtask((Task) evt.getSource(),
+                    (long) evt.getOldValue(),
+                    (long) evt.getNewValue());
         }
     }
 
-    private <T extends Task, V extends Optional<LocalDateTime>> void changedStartTimeTaskSubtask(T task, V oldValue, V newValue) {
+    private <T extends Task, V extends Optional<LocalDateTime>> void changedStartTimeTaskSubtask(T task, V oldValue, V newValue)
+            throws CrossTimeExecution {
         if (oldValue.equals(newValue)) return;
 
         //System.out.println("Произошло изменение значения в поле startTime задачи/подзадачи с " + oldValue + " на " + newValue);
@@ -511,6 +555,48 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
                 .collect(Collectors.toCollection(() -> new TreeSet<Task>(taskComparatorByStartTime)));
 
         if (task.getStartTime().isEmpty()) return;
+
+        if (!isValidatedTaskCross.test(task)) {
+            TypeTask typeTask = TypeTask.TASK;
+
+            if (task instanceof Subtask) typeTask = TypeTask.SUBTASK;
+
+            throw new CrossTimeExecution(String.format("При установке начала времени выполнения %s " +
+                    "возникает пересечение по времени выполнения.", typeTask));
+        }
+
+        tasksSortedByStartTime.add(task);
+
+        //task.addPropertyChangeListener(this);
+    }
+
+    private <T extends Task> void changedDurationTaskSubtask(T task, long oldValue, long newValue)
+            throws CrossTimeExecution {
+        if (oldValue == newValue) return;
+
+        //System.out.println("Произошло изменение значения в поле duration задачи/подзадачи с " + oldValue + " на " + newValue);
+
+        //Учет изменения значения в поле duration объектов классов Task (Subtask):
+        //нет - 1. Отключить прослушивание изменений у объекта (duration).
+        //2. Удалить объект из дерева множества.
+        //3. Проверить, что новое значение не равно null.
+        //4. Добавить объект в дерево множество (сортировка).
+        //нет - 5. Включить прослушивание изменений у объекта (duration).
+
+        //task.removePropertyChangeListener(this);  //задачи нет в дереве, но изменения из null нужно тоже отследить
+
+        tasksSortedByStartTime = tasksSortedByStartTime.stream()
+                .filter(taskCur -> !(taskCur.getId() == task.getId()))
+                .collect(Collectors.toCollection(() -> new TreeSet<Task>(taskComparatorByStartTime)));
+
+        if (!isValidatedTaskCross.test(task)) {
+            TypeTask typeTask = TypeTask.TASK;
+
+            if (task instanceof Subtask) typeTask = TypeTask.SUBTASK;
+
+            throw new CrossTimeExecution(String.format("При установке длительности выполнения %s " +
+                    "возникает пересечение по времени выполнения.", typeTask));
+        }
 
         tasksSortedByStartTime.add(task);
 

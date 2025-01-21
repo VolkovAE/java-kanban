@@ -51,14 +51,11 @@ public class Subtask extends Task {
 
     @Override
     public void setDuration(long newValue) throws SetPropertyTaskException {
-        long oldValue = getDuration();
         try {
             super.setDuration(newValue);
         } catch (SetPropertyTaskException e) {
             throw new SetPropertyTaskException(TypeTask.SUBTASK, e.getIdTask(), e.getMessage());
         }
-
-        if (pcs != null) pcs.firePropertyChange("duration", oldValue, getDuration());
     }
 
     @Override

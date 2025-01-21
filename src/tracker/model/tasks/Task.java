@@ -86,7 +86,9 @@ public class Task {
         if (durationMinutes < 0) throw new SetPropertyTaskException(TypeTask.TASK, id,
                 "Не допускается установка отрицательного значения в продолжительность выполнения задачи.");
 
+        long oldValue = getDuration();
         this.duration = convertMinutesToDuration(durationMinutes);
+        if (pcs != null) pcs.firePropertyChange("duration", oldValue, getDuration());
     }
 
     private Duration convertMinutesToDuration(long durationMinutes) {
