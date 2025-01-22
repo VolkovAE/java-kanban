@@ -5,9 +5,6 @@ import tracker.services.exceptions.SetPropertyTaskException;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.beans.PropertyChangeSupport;
-import java.beans.PropertyChangeListener;
-import java.util.Optional;
 
 public class Subtask extends Task {
     private Epic epic;

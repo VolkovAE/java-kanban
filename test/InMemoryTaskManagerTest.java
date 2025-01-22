@@ -6,21 +6,16 @@ import tracker.model.tasks.Task;
 import tracker.services.HistoryManager;
 import tracker.services.Managers;
 import tracker.services.TaskManager;
-import tracker.services.enums.TypeTask;
 import tracker.services.exceptions.CrossTimeExecution;
-import tracker.services.exceptions.SetPropertyTaskException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static tracker.model.enums.Status.NEW;
-import static tracker.model.enums.Status.IN_PROGRESS;
-import static tracker.model.enums.Status.DONE;
+import static tracker.model.enums.Status.*;
 
 public class InMemoryTaskManagerTest {
     private static final TaskManager taskManager = Managers.getDefault();

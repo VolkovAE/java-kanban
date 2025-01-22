@@ -2,22 +2,15 @@ import org.junit.jupiter.api.Test;
 import tracker.model.tasks.Epic;
 import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
-import tracker.services.FileBackedTaskManager;
 import tracker.services.Managers;
 import tracker.services.TaskManager;
-import tracker.services.enums.TypeTask;
-import tracker.services.exceptions.SetPropertyTaskException;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.LineNumberReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class EpicTest {
     private static final TaskManager taskManager = Managers.getDefault();

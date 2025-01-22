@@ -17,12 +17,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
-import static tracker.services.enums.TypeTask.TASK;
-import static tracker.services.enums.TypeTask.SUBTASK;
-import static tracker.services.enums.TypeTask.EPIC;
-
-import static tracker.model.enums.Status.IN_PROGRESS;
 import static tracker.model.enums.Status.DONE;
+import static tracker.model.enums.Status.IN_PROGRESS;
+import static tracker.services.enums.TypeTask.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
