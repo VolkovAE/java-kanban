@@ -4,13 +4,13 @@ import tracker.services.enums.TypeTask;
 
 public class SetPropertyTaskException extends RuntimeException {
     private final TypeTask typeTask;
-    private final int id_task;
+    private final int taskId;
 
-    public SetPropertyTaskException(TypeTask typeTask, int id_task, String message) {
+    public SetPropertyTaskException(TypeTask typeTask, int taskId, String message) {
         super(message);
 
         this.typeTask = typeTask;
-        this.id_task = id_task;
+        this.taskId = taskId;
     }
 
     public TypeTask getTypeTask() {
@@ -18,12 +18,12 @@ public class SetPropertyTaskException extends RuntimeException {
     }
 
     public int getIdTask() {
-        return id_task;
+        return taskId;
     }
 
     @Override
     public String getMessage() {
         return String.format("При выполнении операций с объектом %s ID %d возникла ошибка %s",
-                typeTask.toString(), id_task, super.getMessage());
+                typeTask.toString(), taskId, super.getMessage());
     }
 }
