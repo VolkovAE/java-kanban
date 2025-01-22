@@ -9,14 +9,11 @@ import tracker.services.exceptions.CrossTimeExecution;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 //Поставил модификатор доступа по умолчанию.
 //Создавать объекты класса InMemoryTaskManager только в Managers.
