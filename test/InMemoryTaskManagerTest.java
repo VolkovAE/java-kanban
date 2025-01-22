@@ -40,13 +40,20 @@ public class InMemoryTaskManagerTest {
 
         assertTrue(id > 0, "Задача не добавлена.");
 
-        Task taskGet = taskManager.getTaskByID(id);
-        assertNotNull(taskGet, "Задача не найдена.");
+        Optional<Task> taskGet = taskManager.getTaskByID(id);
+        taskGet.ifPresentOrElse(taskGetId -> {
+            assertEquals(task, taskGetId, "Задачи не совпадают.");
 
-        assertEquals(task, taskGet, "Задачи не совпадают.");
+            assertTrue(name.equals(taskGetId.getName()) && descr.equals(taskGetId.getDescr()),
+                    "При размещении задача изменилась (имя, наименование).");
+        }, () -> fail("Задача не найдена."));
 
-        assertTrue(name.equals(taskGet.getName()) && descr.equals(taskGet.getDescr()),
-                "При размещении задача изменилась (имя, наименование).");
+//        assertNotNull(taskGet, "Задача не найдена.");
+//
+//        assertEquals(task, taskGet, "Задачи не совпадают.");
+
+//        assertTrue(name.equals(taskGet.getName()) && descr.equals(taskGet.getDescr()),
+//                "При размещении задача изменилась (имя, наименование).");
     }
 
     @Test
@@ -61,12 +68,19 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(IN_PROGRESS, task.getStatus(), "Статус задачи не корректен после обновления.");
 
-        Task taskGet = taskManager.getTaskByID(id);
+        Optional<Task> taskGet = taskManager.getTaskByID(id);
 
-        assertEquals(task, taskGet, "Задачи не совпадают после обновления.");
+        taskGet.ifPresentOrElse(taskGetId -> {
+            assertEquals(task, taskGetId, "Задачи не совпадают после обновления.");
 
-        assertTrue(name.equals(taskGet.getName()) && descr.equals(taskGet.getDescr()),
-                "При обновлении задача изменилась (имя, наименование).");
+            assertTrue(name.equals(taskGetId.getName()) && descr.equals(taskGetId.getDescr()),
+                    "При размещении задача изменилась (имя, наименование).");
+        }, () -> fail("Задача не найдена."));
+
+//        assertEquals(task, taskGet, "Задачи не совпадают после обновления.");
+//
+//        assertTrue(name.equals(taskGet.getName()) && descr.equals(taskGet.getDescr()),
+//                "При обновлении задача изменилась (имя, наименование).");
     }
 
     @Test
@@ -117,17 +131,28 @@ public class InMemoryTaskManagerTest {
 
         assertTrue(id > 0, "Подзадача не добавлена.");
 
-        Subtask subtaskGet = taskManager.getSubtaskByID(id);
-        assertNotNull(subtaskGet, "Подзадача не найдена.");
+        Optional<Subtask> subtaskGet = taskManager.getSubtaskByID(id);
+        subtaskGet.ifPresentOrElse(subtaskGetId -> {
+            assertEquals(subtask, subtaskGetId, "Подзадачи не совпадают.");
 
-        assertEquals(subtask, subtaskGet, "Подзадачи не совпадают.");
+            assertTrue(nameSub.equals(subtaskGetId.getName()) &&
+                            descrSub.equals(subtaskGetId.getDescr()) &&
+                            (subtask.getEpic() == subtaskGetId.getEpic()),
+                    "При размещении подзадача изменилась (имя, наименование, эпик).");
 
-        assertTrue(nameSub.equals(subtaskGet.getName()) &&
-                        descrSub.equals(subtaskGet.getDescr()) &&
-                        (subtask.getEpic() == subtaskGet.getEpic()),
-                "При размещении подзадача изменилась (имя, наименование, эпик).");
+            assertTrue(epic.getSubtasks().contains(subtaskGetId), "Подзадача не добавлены в эпик.");
+        }, () -> fail("Подзадача не найдена."));
 
-        assertTrue(epic.getSubtasks().contains(subtaskGet), "Подзадача не добавлены в эпик.");
+//        assertNotNull(subtaskGet, "Подзадача не найдена.");
+//
+//        assertEquals(subtask, subtaskGet, "Подзадачи не совпадают.");
+//
+//        assertTrue(nameSub.equals(subtaskGet.getName()) &&
+//                        descrSub.equals(subtaskGet.getDescr()) &&
+//                        (subtask.getEpic() == subtaskGet.getEpic()),
+//                "При размещении подзадача изменилась (имя, наименование, эпик).");
+//
+//        assertTrue(epic.getSubtasks().contains(subtaskGet), "Подзадача не добавлены в эпик.");
     }
 
     @Test
@@ -155,14 +180,24 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(DONE, epic.getStatus(), "Статус эпика не корректен после обновления подзадачи.");
 
-        Subtask subtaskGet = taskManager.getSubtaskByID(id);
+        Optional<Subtask> subtaskGet = taskManager.getSubtaskByID(id);
+        subtaskGet.ifPresentOrElse(subtaskGetId -> {
+            assertEquals(subtask, subtaskGetId, "Подзадачи не совпадают после обновления.");
 
-        assertEquals(subtask, subtaskGet, "Подзадачи не совпадают после обновления.");
+            assertTrue(nameSub.equals(subtaskGetId.getName()) &&
+                            descrSub.equals(subtaskGetId.getDescr()) &&
+                            (subtask.getEpic() == subtaskGetId.getEpic()),
+                    "При обновлении подзадача изменилась (имя, наименование, эпик).");
 
-        assertTrue(nameSub.equals(subtaskGet.getName()) &&
-                        descrSub.equals(subtaskGet.getDescr()) &&
-                        (subtask.getEpic() == subtaskGet.getEpic()),
-                "При обновлении подзадача изменилась (имя, наименование, эпик).");
+            assertTrue(epic.getSubtasks().contains(subtaskGetId), "Подзадача не добавлены в эпик.");
+        }, () -> fail("Подзадача не найдена."));
+
+//        assertEquals(subtask, subtaskGet, "Подзадачи не совпадают после обновления.");
+//
+//        assertTrue(nameSub.equals(subtaskGet.getName()) &&
+//                        descrSub.equals(subtaskGet.getDescr()) &&
+//                        (subtask.getEpic() == subtaskGet.getEpic()),
+//                "При обновлении подзадача изменилась (имя, наименование, эпик).");
     }
 
     @Test
@@ -235,15 +270,24 @@ public class InMemoryTaskManagerTest {
 
         assertTrue(id > 0, "Эпик не добавлен.");
 
-        Epic epicGet = taskManager.getEpicByID(id);
-        assertNotNull(epicGet, "Эпик не найден.");
+        Optional<Epic> epicGet = taskManager.getEpicByID(id);
+        epicGet.ifPresentOrElse(epicGetId -> {
+            assertEquals(epic, epicGetId, "Эпики не совпадают.");
 
-        assertEquals(epic, epicGet, "Эпики не совпадают.");
+            assertTrue(nameEpic.equals(epicGetId.getName()) && descrEpic.equals(epicGetId.getDescr()),
+                    "При размещении эпик изменился (имя, наименование).");
 
-        assertTrue(epicGet.getSubtasks().isEmpty(), "В эпике появились подзадачи.");
+            assertTrue(epicGetId.getSubtasks().isEmpty(), "В эпике появились подзадачи.");
+        }, () -> fail("Эпик не найден."));
 
-        assertTrue(nameEpic.equals(epicGet.getName()) && descrEpic.equals(epicGet.getDescr()),
-                "При размещении эпик изменился (имя, наименование).");
+//        assertNotNull(epicGet, "Эпик не найден.");
+//
+//        assertEquals(epic, epicGet, "Эпики не совпадают.");
+//
+//        assertTrue(epicGet.getSubtasks().isEmpty(), "В эпике появились подзадачи.");
+//
+//        assertTrue(nameEpic.equals(epicGet.getName()) && descrEpic.equals(epicGet.getDescr()),
+//                "При размещении эпик изменился (имя, наименование).");
     }
 
     @Test
@@ -259,12 +303,20 @@ public class InMemoryTaskManagerTest {
 
         assertEquals(NEW, epic.getStatus(), "Статус эпика не корректен после обновления.");
 
-        Epic epicGet = taskManager.getEpicByID(id);
+        Optional<Epic> epicGet = taskManager.getEpicByID(id);
+        epicGet.ifPresentOrElse(epicGetId -> {
+            assertEquals(epic, epicGetId, "Эпики не совпадают после обновления.");
 
-        assertEquals(epic, epicGet, "Эпики не совпадают после обновления.");
+            assertTrue(nameEpic.equals(epicGetId.getName()) && descrEpic.equals(epicGetId.getDescr()),
+                    "При обновлении эпик изменился (имя, наименование).");
 
-        assertTrue(nameEpic.equals(epicGet.getName()) && descrEpic.equals(epicGet.getDescr()),
-                "При обновлении эпик изменился (имя, наименование).");
+            assertTrue(epicGetId.getSubtasks().isEmpty(), "В эпике появились подзадачи.");
+        }, () -> fail("Эпик не найден."));
+
+//        assertEquals(epic, epicGet, "Эпики не совпадают после обновления.");
+//
+//        assertTrue(nameEpic.equals(epicGet.getName()) && descrEpic.equals(epicGet.getDescr()),
+//                "При обновлении эпик изменился (имя, наименование).");
     }
 
     @Test
@@ -276,40 +328,77 @@ public class InMemoryTaskManagerTest {
 
         int id = taskManager.addEpic(epic);
 
-        Epic epicDel = taskManager.delEpicByID(id);
+        Optional<Epic> epicDel = taskManager.delEpicByID(id);
+        epicDel.ifPresentOrElse(epicDelId -> {
+            assertEquals(epic, epicDelId, "Не возвращена ссылка на удаляемый эпик.");
 
-        assertEquals(epic, epicDel, "Не возвращена ссылка на удаляемый эпик.");
+            assertTrue(epicDelId.getSubtasks().isEmpty(), "Список подзадач эпика не пустой.");
 
-        assertTrue(epicDel.getSubtasks().isEmpty(), "Список подзадач эпика не пустой.");
+            List<Epic> epics = taskManager.getEpics();
 
-        List<Epic> epics = taskManager.getEpics();
+            assertFalse(epics.contains(epicDelId), "Эпик не удален.");
 
-        assertFalse(epics.contains(epic), "Эпик не удален.");
+            assertTrue(taskManager.getSubtasks().stream().noneMatch(subtask -> subtask.getEpic().equals(epicDelId)),
+                    "Подзадачи эпика не удалены из списка подзадач.");
+//            boolean isDelSubtasks = true;
+//            for (Subtask subtask : taskManager.getSubtasks()) {
+//                if (subtask.getEpic().equals(epicDelId)) {
+//                    isDelSubtasks = false;
+//
+//                    break;
+//                }
+//            }
 
-        boolean isDelSubtasks = true;
-        for (Subtask subtask : taskManager.getSubtasks()) {
-            if (subtask.getEpic().equals(epicDel)) {
-                isDelSubtasks = false;
+            List<Task> history = historyManager.getHistory();
+            assertFalse(history.contains(epicDelId), "Эпик не удален из истории.");
 
-                break;
-            }
-        }
-        assertTrue(isDelSubtasks, "Подзадачи эпика не удалены из списка подзадач.");
+//            boolean isDelHistory = true;
+//            for (Task task : history) {
+//                if (task instanceof Subtask) {
+//                    if (((Subtask) task).getEpic().equals(epicDelId)) {
+//                        isDelHistory = false;
+//
+//                        break;
+//                    }
+//                }
+//            }
+            assertTrue(history.stream().noneMatch(task ->
+                            (task instanceof Subtask) && ((Subtask) task).getEpic().equals(epicDelId)),
+                    "Подзадачи эпика не удалены из истории.");
+        }, () -> fail("Эпик не найден."));
 
-        List<Task> history = historyManager.getHistory();
-        assertFalse(history.contains(epicDel), "Эпик не удален из истории.");
-
-        boolean isDelHistory = true;
-        for (Task task : history) {
-            if (task instanceof Subtask) {
-                if (((Subtask) task).getEpic().equals(epicDel)) {
-                    isDelHistory = false;
-
-                    break;
-                }
-            }
-        }
-        assertTrue(isDelHistory, "Подзадачи эпика не удалены из истории.");
+//        assertEquals(epic, epicDel, "Не возвращена ссылка на удаляемый эпик.");
+//
+//        assertTrue(epicDel.getSubtasks().isEmpty(), "Список подзадач эпика не пустой.");
+//
+//        List<Epic> epics = taskManager.getEpics();
+//
+//        assertFalse(epics.contains(epic), "Эпик не удален.");
+//
+//        boolean isDelSubtasks = true;
+//        for (Subtask subtask : taskManager.getSubtasks()) {
+//            if (subtask.getEpic().equals(epicDel)) {
+//                isDelSubtasks = false;
+//
+//                break;
+//            }
+//        }
+//        assertTrue(isDelSubtasks, "Подзадачи эпика не удалены из списка подзадач.");
+//
+//        List<Task> history = historyManager.getHistory();
+//        assertFalse(history.contains(epicDel), "Эпик не удален из истории.");
+//
+//        boolean isDelHistory = true;
+//        for (Task task : history) {
+//            if (task instanceof Subtask) {
+//                if (((Subtask) task).getEpic().equals(epicDel)) {
+//                    isDelHistory = false;
+//
+//                    break;
+//                }
+//            }
+//        }
+//        assertTrue(isDelHistory, "Подзадачи эпика не удалены из истории.");
     }
 
     @Test
@@ -362,8 +451,8 @@ public class InMemoryTaskManagerTest {
         Task task = new Task(name, descr);
         int id = taskManager.addTask(task);
 
-        Task task1 = taskManager.getTaskByID(id);
-        Task task2 = taskManager.getTaskByID(id);
+        Optional<Task> task1 = taskManager.getTaskByID(id);
+        Optional<Task> task2 = taskManager.getTaskByID(id);
 
         assertEquals(task1, task2, "Задачи с одинаковыми идентификаторами не равны друг другу.");
     }
@@ -383,8 +472,8 @@ public class InMemoryTaskManagerTest {
         Subtask subtask = new Subtask(nameSub, descrSub, epic);
         int id = taskManager.addSubtask(subtask);
 
-        Subtask subtask1 = taskManager.getSubtaskByID(id);
-        Subtask subtask2 = taskManager.getSubtaskByID(id);
+        Optional<Subtask> subtask1 = taskManager.getSubtaskByID(id);
+        Optional<Subtask> subtask2 = taskManager.getSubtaskByID(id);
 
         assertEquals(subtask1, subtask2, "Подзадачи с одинаковыми идентификаторами не равны друг другу.");
     }
@@ -400,8 +489,8 @@ public class InMemoryTaskManagerTest {
 
         int id = taskManager.addEpic(epic);
 
-        Epic epic1 = taskManager.getEpicByID(id);
-        Epic epic2 = taskManager.getEpicByID(id);
+        Optional<Epic> epic1 = taskManager.getEpicByID(id);
+        Optional<Epic> epic2 = taskManager.getEpicByID(id);
 
         assertEquals(epic1, epic2, "Эпики с одинаковыми идентификаторами не равны друг другу.");
     }

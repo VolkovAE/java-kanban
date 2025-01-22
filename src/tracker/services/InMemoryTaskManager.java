@@ -16,6 +16,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 //Поставил модификатор доступа по умолчанию.
 //Создавать объекты класса InMemoryTaskManager только в Managers.
@@ -130,9 +131,11 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
     /// Подзадачи
     @Override
     public void delAllSubtasks() {
-        for (Subtask subtask : subtasks.values()) {
-            historyManager.remove(subtask.getId());
-        }
+//        for (Subtask subtask : subtasks.values()) {
+//            historyManager.remove(subtask.getId());
+//        }
+        //Заменил на Stream API.
+        subtasks.values().stream().forEach(subtask -> historyManager.remove(subtask.getId()));
 
         delAllTasksIntasksSortedByStartTime(Subtask.class);
 
@@ -144,13 +147,17 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
     /// Эпики.
     @Override
     public void delAllEpics() {
-        for (Subtask subtask : subtasks.values()) {
-            historyManager.remove(subtask.getId());
-        }
+//        for (Subtask subtask : subtasks.values()) {
+//            historyManager.remove(subtask.getId());
+//        }
+        //Заменил на Stream API.
+        subtasks.values().stream().forEach(subtask -> historyManager.remove(subtask.getId()));
 
-        for (Epic epic : epics.values()) {
-            historyManager.remove(epic.getId());
-        }
+//        for (Epic epic : epics.values()) {
+//            historyManager.remove(epic.getId());
+//        }
+        //Заменил на Stream API.
+        epics.values().stream().forEach(epic -> historyManager.remove(epic.getId()));
 
         subtasks.clear();
         epics.clear();
@@ -161,38 +168,38 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
 
     /// Задачи.
     @Override
-    public Task getTaskByID(int id) {
-        if (!tasks.containsKey(id)) return null;
+    public Optional<Task> getTaskByID(int id) {
+        if (!tasks.containsKey(id)) return Optional.empty();
 
         Task task = tasks.get(id);
 
         historyManager.add(task);   //просмотр задачи
 
-        return task;
+        return Optional.of(task);
     }
 
     /// Подзадачи.
     @Override
-    public Subtask getSubtaskByID(int id) {
-        if (!subtasks.containsKey(id)) return null;
+    public Optional<Subtask> getSubtaskByID(int id) {
+        if (!subtasks.containsKey(id)) return Optional.empty();
 
         Subtask subtask = subtasks.get(id);
 
         historyManager.add(subtask);    //просмотр подзадачи
 
-        return subtask;
+        return Optional.of(subtask);
     }
 
     /// Эпика.
     @Override
-    public Epic getEpicByID(int id) {
-        if (!epics.containsKey(id)) return null;
+    public Optional<Epic> getEpicByID(int id) {
+        if (!epics.containsKey(id)) return Optional.empty();
 
         Epic epic = epics.get(id);
 
         historyManager.add(epic);   //просмотр эпика
 
-        return epic;
+        return Optional.of(epic);
     }
     //endregion
 
@@ -362,24 +369,43 @@ class InMemoryTaskManager implements TaskManager, PropertyChangeListener {
 
     /// Эпика.
     @Override
-    public Epic delEpicByID(int id) {
+    public Optional<Epic> delEpicByID(int id) {
         if (!epics.containsKey(id)) return null;
 
         //Удаляем все подзадачи эпика.
-        Epic epic = getEpicByID(id);
-        List<Subtask> subtasksByEpic = epic.getSubtasks(); //getSubtasksByEpic(epic);
-
-        for (Subtask subtask : subtasksByEpic) {    //оставил, потому что удаляю ссылки на подзадачи из subtasks
-            subtasks.remove(subtask.getId());
-            historyManager.remove(subtask.getId()); //удаляем подзадачу из истории просмотров
+        //Обертка для использования в лямбде.
+        interface Wrapper {
         }
 
-        epic.setSubtasks(); //удаляю ссылки на подзадачи из списка подзадач удаляемого эпика (сделал в сеттере)
+        var wrapper = new Wrapper() {
+            List<Subtask> subtasksByEpic;
+        };
+
+        Optional<Epic> epic = getEpicByID(id);
+        epic.ifPresent(epicGetId -> {
+            wrapper.subtasksByEpic = epicGetId.getSubtasks();
+        });
+        //List<Subtask> subtasksByEpic = epic.getSubtasks(); //getSubtasksByEpic(epic);
+
+//        for (Subtask subtask : subtasksByEpic) {    //оставил, потому что удаляю ссылки на подзадачи из subtasks
+//            subtasks.remove(subtask.getId());
+//            historyManager.remove(subtask.getId()); //удаляем подзадачу из истории просмотров
+//        }
+        //Заменил на использование Stream API.
+        wrapper.subtasksByEpic.stream()
+                .forEach(subtask -> {
+                    subtasks.remove(subtask.getId());
+                    historyManager.remove(subtask.getId()); //удаляем подзадачу из истории просмотров
+                });
+
+        epic.ifPresent(Epic::setSubtasks);
+        //epic.setSubtasks(); //удаляю ссылки на подзадачи из списка подзадач удаляемого эпика (сделал в сеттере)
 
         //После удаления подзадач, удаляем сам эпик.
         epics.remove(id);
 
-        historyManager.remove(epic.getId());    //удаляем эпик из истории просмотров
+        epic.ifPresent(epicGetId -> historyManager.remove(epicGetId.getId()));
+        //historyManager.remove(epic.getId());    //удаляем эпик из истории просмотров
 
         return epic;
     }

@@ -173,8 +173,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         switch (arr[1]) {
             case "EPIC" -> task = new Epic(arr[2], arr[4]);
             case "TASK" -> task = new Task(arr[2], arr[4], startTime, duration);
-            case "SUBTASK" ->
-                    task = new Subtask(arr[2], arr[4], this.getEpicByID(Integer.parseInt(arr[5])), startTime, duration);
+            case "SUBTASK" -> {
+                int epicId = Integer.parseInt(arr[5]);
+                Optional<Epic> epic = this.getEpicByID(epicId);
+                if (epic.isEmpty()) throw new ManagerSaveException(String.format("Не верный формат файла. " +
+                        "Эпик с ID %d не найден.", epicId));
+                //task = new Subtask(arr[2], arr[4], this.getEpicByID(Integer.parseInt(arr[5])), startTime, duration);
+                task = new Subtask(arr[2], arr[4], epic.get(), startTime, duration);
+            }
             default -> {
                 return null;
             }
@@ -318,8 +324,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Epic delEpicByID(int id) {
-        Epic delEpic = super.delEpicByID(id);
+    public Optional<Epic> delEpicByID(int id) {
+        Optional<Epic> delEpic = super.delEpicByID(id);
         save();
 
         return delEpic;
