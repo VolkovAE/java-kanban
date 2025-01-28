@@ -59,34 +59,45 @@ public class TestTracker {
     }
 
     private void execTest002() {
-        taskManager.updateTask(taskManager.getTaskByID(1));
-        taskManager.updateTask(taskManager.getTaskByID(2));
-        taskManager.updateTask(taskManager.getTaskByID(1));
-        taskManager.updateSubtask(taskManager.getSubtaskByID(4));
+        taskManager.getTaskByID(1).ifPresent(taskManager::updateTask);
+        taskManager.getTaskByID(2).ifPresent(taskManager::updateTask);
+        taskManager.getTaskByID(1).ifPresent(taskManager::updateTask);
+        taskManager.getSubtaskByID(4).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateTask(taskManager.getTaskByID(1));
+        //taskManager.updateTask(taskManager.getTaskByID(2));
+        //taskManager.updateTask(taskManager.getTaskByID(1));
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(4));
 
         print("002. Изменения: task1 = done, task2 = in_progress, subtask11|epic1 = in_progress, остальное без изменений.");
     }
 
     private void execTest003() {
-        taskManager.updateSubtask(taskManager.getSubtaskByID(7));
+        taskManager.getSubtaskByID(7).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(7));
         print("003.1 subtask21|epic2 = in_progress, остальное без изменений");
 
-        taskManager.updateSubtask(taskManager.getSubtaskByID(7));
+        taskManager.getSubtaskByID(7).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(7));
         print("003.2 subtask21|epic2 = done, остальное без изменений");
 
-        taskManager.updateSubtask(taskManager.getSubtaskByID(4));
+        taskManager.getSubtaskByID(4).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(4));
         print("003.3 subtask11 = done, остальное без изменений");
 
-        taskManager.updateSubtask(taskManager.getSubtaskByID(4));
+        taskManager.getSubtaskByID(4).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(4));
         print("003.4 без изменений");
 
-        taskManager.updateSubtask(taskManager.getSubtaskByID(5));
+        taskManager.getSubtaskByID(5).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(5));
         print("003.5 subtask12 = in_progress, остальное без изменений");
 
-        taskManager.updateSubtask(taskManager.getSubtaskByID(5));
+        taskManager.getSubtaskByID(5).ifPresent(taskManager::updateSubtask);
+        //taskManager.updateSubtask(taskManager.getSubtaskByID(5));
         print("003.6 subtask12|epic2 = done, остальное без изменений");
 
-        taskManager.updateTask(taskManager.getTaskByID(2));
+        taskManager.getTaskByID(2).ifPresent(taskManager::updateTask);
+        //taskManager.updateTask(taskManager.getTaskByID(2));
         print("003.7 Все задачи/подзадачи/эпики закрыты.");
     }
 

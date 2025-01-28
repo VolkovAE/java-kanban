@@ -5,6 +5,7 @@ import tracker.model.tasks.Subtask;
 import tracker.model.tasks.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskManager {
     /* Методы для каждого из типа задач(Задача/Эпик/Подзадача): */
@@ -26,11 +27,11 @@ public interface TaskManager {
     //endregion
 
     //region c. Получение по идентификатору.
-    Task getTaskByID(int id);
+    Optional<Task> getTaskByID(int id);
 
-    Subtask getSubtaskByID(int id);
+    Optional<Subtask> getSubtaskByID(int id);
 
-    Epic getEpicByID(int id);
+    Optional<Epic> getEpicByID(int id);
     //endregion
 
     //region d. Создание. Сам объект должен передаваться в качестве параметра.
@@ -54,7 +55,7 @@ public interface TaskManager {
 
     Subtask delSubtaskByID(int id);
 
-    Epic delEpicByID(int id);
+    Optional<Epic> delEpicByID(int id);
     //endregion
 
     //region Дополнительные методы.
@@ -63,5 +64,7 @@ public interface TaskManager {
     List<Subtask> getSubtasksByEpic(Epic epic);
 
     HistoryManager getHistoryManager();
+
+    List<Task> getPrioritizedTasks();
     //endregion
 }
