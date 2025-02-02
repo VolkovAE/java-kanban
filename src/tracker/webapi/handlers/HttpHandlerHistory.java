@@ -9,7 +9,6 @@ import tracker.webapi.enums.TypesRequests;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Класс обработки запросов с базовым путем HISTORY.

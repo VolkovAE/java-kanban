@@ -3,8 +3,6 @@ import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tracker.model.enums.Status;
-import tracker.model.tasks.Task;
 import tracker.services.Managers;
 import tracker.services.TaskManager;
 import tracker.webapi.HttpTaskServer;
@@ -19,10 +17,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HttpTaskManagerHistoryTest {
     TaskManager taskManager = Managers.getDefault();
