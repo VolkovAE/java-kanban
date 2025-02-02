@@ -19,7 +19,7 @@ public class Task {
     protected LocalDateTime startTime = null;   //дата и время, когда предполагается приступить к задаче
     protected Duration duration = Duration.ZERO;    //плановая продолжительность выполнения задачи в минутах
 
-    transient protected PropertyChangeSupport pcs;
+    protected transient PropertyChangeSupport pcs;
 
     public final void addPropertyChangeListener(PropertyChangeListener listener) {
         //Инициализацию будем делать при подключении слушателя.
