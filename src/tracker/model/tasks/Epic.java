@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Epic extends Task implements PropertyChangeListener {
-    private List<Subtask> subtasks = new ArrayList<>();
+    transient private List<Subtask> subtasks = new ArrayList<>();
 
     //Группа временных параметров (начала выполнения, продолжительность, конец выполнения).
     //Обозначаем аббревиатурой SDE (startTime, duration, endTime).
@@ -26,10 +26,14 @@ public class Epic extends Task implements PropertyChangeListener {
     }
 
     public List<Subtask> getSubtasks() {
+        if (subtasks == null) subtasks = new ArrayList<>();
+
         return new ArrayList<>(subtasks);   //subtasks;
     }
 
     public void setSubtasks() {
+        if (subtasks == null) subtasks = new ArrayList<>();
+
         for (Subtask subtask : subtasks) subtask.removePropertyChangeListener(this);
 
         subtasks = new ArrayList<>();   //в сеттере будем сбрасывать список подзадач
@@ -38,6 +42,8 @@ public class Epic extends Task implements PropertyChangeListener {
     }
 
     public void setSubtasks(Subtask subtask) {
+        if (subtasks == null) subtasks = new ArrayList<>();
+
         subtask.addPropertyChangeListener(this);
 
         subtasks.add(subtask);
@@ -46,6 +52,8 @@ public class Epic extends Task implements PropertyChangeListener {
     }
 
     public void setSubtasks(List<Subtask> subtasks) {
+        if (this.subtasks == null) this.subtasks = new ArrayList<>();
+
         for (Subtask subtask : this.subtasks) subtask.removePropertyChangeListener(this);
         for (Subtask subtask : subtasks) subtask.addPropertyChangeListener(this);
 
