@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Epic extends Task implements PropertyChangeListener {
-    transient private List<Subtask> subtasks = new ArrayList<>();
+    private transient List<Subtask> subtasks = new ArrayList<>();
 
     //Группа временных параметров (начала выполнения, продолжительность, конец выполнения).
     //Обозначаем аббревиатурой SDE (startTime, duration, endTime).
