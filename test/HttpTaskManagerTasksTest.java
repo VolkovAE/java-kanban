@@ -256,4 +256,19 @@ public class HttpTaskManagerTasksTest {
         // проверяем код ответа
         assertEquals(404, response.statusCode());
     }
+
+    @Test
+    public void testMethodNotAllowed() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/tasks");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .PUT(HttpRequest.BodyPublishers.ofString(""))
+                .build();
+
+        // вызываем рест, отвечающий за создание задач
+        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // проверяем код ответа
+        assertEquals(405, response.statusCode());
+    }
 }

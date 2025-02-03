@@ -2,8 +2,8 @@ package tracker.webapi.handlers;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import tracker.model.tasks.Subtask;
+import tracker.services.Managers;
 import tracker.services.TaskManager;
 import tracker.services.exceptions.CrossTimeExecution;
 import tracker.webapi.enums.TypesRequests;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Класс обработки запросов с базовым путем SUBTASKS.
  */
-public class HttpHandlerSubtasks extends BaseHttpHandler implements HttpHandler {
+public class HttpHandlerSubtasks extends BaseHttpHandler {
     private TaskManager taskManager;
 
     public HttpHandlerSubtasks(TaskManager taskManager) {
@@ -30,7 +30,7 @@ public class HttpHandlerSubtasks extends BaseHttpHandler implements HttpHandler 
         try {
             typeRequests = getTypeRequest(exchange);
         } catch (IllegalArgumentException e) {
-            sendError(exchange, 400, e.getMessage());   //клиент указал не корректный тип запроса (метод)
+            sendError(exchange, 405, e.getMessage());   //клиент указал не корректный тип запроса (метод)
             return;
         }
 
@@ -54,20 +54,20 @@ public class HttpHandlerSubtasks extends BaseHttpHandler implements HttpHandler 
             createUpdateSubtask(exchange);
         } else if (typeRequests.isDelete()) {
             deleteSubtask(exchange, id);
-        }
+        } else sendError(exchange, 405, "Метод не разрешен.");
     }
 
     private void getSubtasks(HttpExchange exchange) throws IOException {
         List<Subtask> taskList = taskManager.getSubtasks();
 
-        String tasksJson = createGson().toJson(taskList);
+        String tasksJson = Managers.createGson().toJson(taskList);
 
         sendText(exchange, tasksJson);
     }
 
     private void getSubtaskById(HttpExchange exchange, int id) throws IOException, RuntimeException {
         taskManager.getSubtaskByID(id).ifPresentOrElse((Subtask subtask) -> {
-                    String taskJson = createGson().toJson(subtask);
+                    String taskJson = Managers.createGson().toJson(subtask);
 
                     try {
                         sendText(exchange, taskJson);
@@ -95,7 +95,7 @@ public class HttpHandlerSubtasks extends BaseHttpHandler implements HttpHandler 
 
         Subtask subtask;
         try {
-            subtask = createGson().fromJson(body, Subtask.class);
+            subtask = Managers.createGson().fromJson(body, Subtask.class);
         } catch (JsonSyntaxException e) {
             sendError(exchange, 400, "Передан некорректный формат задачи.");
 

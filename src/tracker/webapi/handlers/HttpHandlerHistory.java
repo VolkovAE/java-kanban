@@ -1,9 +1,9 @@
 package tracker.webapi.handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import tracker.model.tasks.Task;
 import tracker.services.HistoryManager;
+import tracker.services.Managers;
 import tracker.services.TaskManager;
 import tracker.webapi.enums.TypesRequests;
 
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Класс обработки запросов с базовым путем HISTORY.
  */
-public class HttpHandlerHistory extends BaseHttpHandler implements HttpHandler {
+public class HttpHandlerHistory extends BaseHttpHandler {
     private TaskManager taskManager;
 
     public HttpHandlerHistory(TaskManager taskManager) {
@@ -26,18 +26,19 @@ public class HttpHandlerHistory extends BaseHttpHandler implements HttpHandler {
         try {
             typeRequests = getTypeRequest(exchange);
         } catch (IllegalArgumentException e) {
-            sendError(exchange, 400, e.getMessage());   //клиент указал не корректный тип запроса (метод)
+            sendError(exchange, 405, e.getMessage());   //клиент указал не корректный тип запроса (метод)
             return;
         }
 
         if (typeRequests.isGet()) getHistory(exchange);
+        else sendError(exchange, 405, "Метод не разрешен.");    //если не GET запрос
     }
 
     public void getHistory(HttpExchange exchange) throws IOException {
         HistoryManager historyManager = taskManager.getHistoryManager();
         List<Task> taskList = historyManager.getHistory();
 
-        String tasksJson = createGson().toJson(taskList);
+        String tasksJson = Managers.createGson().toJson(taskList);
 
         sendText(exchange, tasksJson);
     }

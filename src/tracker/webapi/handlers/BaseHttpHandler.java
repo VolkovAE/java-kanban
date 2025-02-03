@@ -1,22 +1,23 @@
 package tracker.webapi.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import tracker.webapi.enums.TypesRequests;
-import tracker.webapi.handlers.adapters.DurationAdapter;
-import tracker.webapi.handlers.adapters.LocalDateTimeAdapter;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
+    /**
+     * Константы значений заголовков HTTP-запросов.
+     */
+    private static final String HEADER_CONTENT_TYPE_JSON = "application/json;charset=utf-8";
+    private static final String HEADER_CONTENT_TYPE_PLANE = "text/plane;charset=utf-8";
+
     /**
      * Выделяем значения параметры пути из строки запроса при их наличии.
      * Структура пути запроса:
@@ -51,23 +52,11 @@ public class BaseHttpHandler {
     }
 
     /**
-     * Создаем по единым правилам объект класса Gson.
-     */
-    protected Gson createGson() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .create();
-    }
-
-    /**
      * Для отправки общего ответа в случае ошибки.
      */
     protected void sendError(HttpExchange h, int errorCode, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plane;charset=utf-8");
+        h.getResponseHeaders().add("Content-Type", HEADER_CONTENT_TYPE_PLANE);
         h.sendResponseHeaders(errorCode, resp.length);
 
         try (OutputStream outputStream = h.getResponseBody()) {
@@ -82,7 +71,7 @@ public class BaseHttpHandler {
      */
     protected void sendText(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.getResponseHeaders().add("Content-Type", HEADER_CONTENT_TYPE_JSON);
         h.sendResponseHeaders(200, resp.length);
 
         try (OutputStream outputStream = h.getResponseBody()) {
@@ -97,7 +86,7 @@ public class BaseHttpHandler {
      */
     protected void sendResourceCreated(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plane;charset=utf-8");
+        h.getResponseHeaders().add("Content-Type", HEADER_CONTENT_TYPE_PLANE);
         h.sendResponseHeaders(201, resp.length);
 
         try (OutputStream outputStream = h.getResponseBody()) {
@@ -121,7 +110,7 @@ public class BaseHttpHandler {
      */
     protected void sendNotFound(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plane;charset=utf-8");
+        h.getResponseHeaders().add("Content-Type", HEADER_CONTENT_TYPE_PLANE);
         h.sendResponseHeaders(404, resp.length);
 
         try (OutputStream outputStream = h.getResponseBody()) {
@@ -136,7 +125,7 @@ public class BaseHttpHandler {
      */
     protected void sendHasInteractions(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plane;charset=utf-8");
+        h.getResponseHeaders().add("Content-Type", HEADER_CONTENT_TYPE_PLANE);
         h.sendResponseHeaders(406, resp.length);
 
         try (OutputStream outputStream = h.getResponseBody()) {

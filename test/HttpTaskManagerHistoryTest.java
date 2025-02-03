@@ -142,4 +142,19 @@ public class HttpTaskManagerHistoryTest {
 
         assertTrue(etalon.equals(response.body()), "Информация по истории просмотров не корректна.");
     }
+
+    @Test
+    public void testMethodNotAllowed() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/history");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .DELETE()
+                .build();
+
+        // вызываем рест, отвечающий за создание задач
+        HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // проверяем код ответа
+        assertEquals(405, response.statusCode());
+    }
 }
