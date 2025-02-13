@@ -1,8 +1,15 @@
 package tracker.services;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import tracker.webapi.handlers.adapters.DurationAdapter;
+import tracker.webapi.handlers.adapters.LocalDateTimeAdapter;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Managers {
 
@@ -36,5 +43,17 @@ public class Managers {
     public static HistoryManager getDefaultHistory() {
 
         return new InMemoryHistoryManager();
+    }
+
+    /**
+     * Создаем по единым правилам объект класса Gson.
+     */
+    public static Gson createGson() {
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .serializeNulls()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .create();
     }
 }
